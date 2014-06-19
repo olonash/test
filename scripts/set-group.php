@@ -6,14 +6,14 @@ $db = db_connect();
 
 if(user_verified()) {
 	$_SESSION['groupid'] = $_POST['groupid'];	
-	/*$query = $db->prepare('
+	$query = $db->prepare('
 		SELECT * FROM chat_groupsaccounts WHERE groupsaccounts_accountid = :accountid AND groupsaccounts_groupid =:groupid
 	');
 	$query->execute(array(
 		'accountid' => $_SESSION['id'],
 		'groupid' 	=> $_SESSION['groupid']
-	));*/
-	/*$count = $query->rowCount();
+	));
+	$count = $query->rowCount();
 	if ($count == 0){
 		//set group
 	    $insert = $db->prepare('
@@ -25,6 +25,6 @@ if(user_verified()) {
 				'groupidip' => $_SESSION['groupid'],
 				'time' => date("Y-m-d h:i:s")
 		));
-	}*/
+	}
 }
 ?>
