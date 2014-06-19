@@ -100,7 +100,7 @@ $(document).ready(function() {
 	}
 	getGroups();
 	getOnlineUsers();
-	getMessages();
+	//getMessages();
 });
 
 

@@ -11,15 +11,18 @@ $msg = "";
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 	<script src="js/chat.js"></script>	
 </head>
+
 <body>
 	<div id="container">
 		<h1>Test chat</h1>
 		<?php
+		
 		//deconnexion
 		if(isset($_GET['logout']) && $_GET['id'] && $_GET['logout']==1){
 			unset($_SESSION['id']);
 			unset($_SESSION['time']);
 			unset($_SESSION['login']);	
+			unset($_SESSION['groupid']);
 		}
 
 
@@ -69,7 +72,7 @@ $msg = "";
 					$insert->execute(array(
 							'accountid' => $_SESSION['id'],
 							'groupidip' => 1,
-							'time' => time()
+							'time' => date("Y-m-d h:i:s")
 					));
 
 			    }else{
