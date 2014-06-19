@@ -15,7 +15,7 @@ if(user_verified()) {
 	$count = $query->rowCount();
 	if($count != 0) {
 		while ($data = $query->fetch()) {
-			$json['groups'] .= '<li class = "'.$data['groups_id'].'">'. $data['groups_name'] . '</li>';
+			$json['groups'] .= '<li class ="setgroup" onclick = "setGroup('.$data['groups_id'].')">'. $data['groups_name'] . '</li>';
 		}
 	}
 	echo json_encode($json);

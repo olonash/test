@@ -1,15 +1,15 @@
 <?php
 session_start();
-include('functions.php');
+include('scripts/functions.php');
 $db = db_connect();
 
 $msg = "";
 ?>
 <html>
 <head>
-	<link rel="stylesheet" type="text/css" href="common.css">
+	<link rel="stylesheet" type="text/css" href="css/common.css">
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-	<script src="chat.js"></script>	
+	<script src="js/chat.js"></script>	
 </head>
 <body>
 	<div id="container">
@@ -46,6 +46,32 @@ $msg = "";
 			        // On crée une session time qui prend la valeur de la date de connexion
 			        $_SESSION['time'] = time();
 			        $_SESSION['login'] = $data['account_login'];
+			        $_SESSION['groupid'] = 1;
+
+			        //set status
+			        $insert = $db->prepare('
+					INSERT INTO chat_online (online_id, online_ip, online_user, online_status, online_time) 
+					VALUES(:id, :ip, :user, :status, :time)
+					');
+					$insert->execute(array(
+							'id' => '',
+							'ip' => $_SERVER["REMOTE_ADDR"],
+							'user' => $_SESSION['id'],
+							'status' => 2,
+							'time' => time()
+					));
+
+					//set group
+			        $insert = $db->prepare('
+					INSERT INTO chat_groupsaccounts (groupsaccounts_accounid, groupsaccounts_groupid, groupsaccounts_creationdate) 
+					VALUES(:accountid, :groupidip, :time)
+					');
+					$insert->execute(array(
+							'accountid' => $_SESSION['id'],
+							'groupidip' => 1,
+							'time' => time()
+					));
+
 			    }else{
 			    	$msg = 'password incorrect';
 			    }
@@ -92,6 +118,7 @@ $msg = "";
 						<option value="1">Occup&eacute;</option>
 						<option value="2" selected>En ligne</option>
 					</select>
+					<button onclick="getOnlineUsers()"> aaaaa</button>
 				</td>
 			</tr>
 		</table>

@@ -8,6 +8,12 @@ a {
 img {
     vertical-align: middle;
 }
+ul{
+    padding-left :5px;
+}
+li {
+    list-style: none;
+}
 /* Conteneur principal des blocs de la page */
 #container {
     width: 80%;
@@ -81,3 +87,9 @@ et utilisateurs connectés */
 .info {
     color: green;
 }
+
+#group-list li {
+    cursor: pointer;
+}
+
+

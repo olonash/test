@@ -6,7 +6,7 @@ $db = db_connect();
 
 <?php
 // On vérifie que l'utilisateur est inscrit dans la base de données
-$query = $db->prepare("
+/*$query = $db->prepare("
 	SELECT *
 	FROM chat_online
 	WHERE online_user = :user 
@@ -19,8 +19,7 @@ $count = $query->rowCount();
 $data = $query->fetch();
 
 if(user_verified()) {
-	/* si l'utilisateur n'est pas inscrit dans la BDD, on l'ajoute, sinon
-	on modifie la date de sa derniere actualisation */
+	
 	if($count == 0) {
 		$insert = $db->prepare('
 			INSERT INTO chat_online (online_id, online_ip, online_user, online_status, online_time) 
@@ -42,30 +41,34 @@ if(user_verified()) {
 	}
 }
 
-$query->closeCursor();
+$query->closeCursor();*/
 ?>
 
 <?php
 // On supprime les membres qui ne sont pas sur le chat,
 // donc qui n'ont pas actualisé automatiquement ce fichier récemment
-$time_out = time()-5;
+/*$time_out = time()-5;
 $delete = $db->prepare('DELETE FROM chat_online WHERE online_time < :time');
 $delete->execute(array(
 	'time' => $time_out
-));
+));*/
 ?>
 
 
 <?php
-// Récupère les membres en ligne sur le chat
-// et retourne une liste
 $query = $db->prepare("
-	SELECT online_id, online_id, online_user, online_status, online_time, account_id, account_login
+	SELECT online_id, online_user, online_status , account_id, account_login
 	FROM chat_online 
 	LEFT JOIN chat_accounts ON chat_accounts.account_id = chat_online.online_user 
-	ORDER BY account_login
+	LEFT JOIN chat_groupsaccounts on chat_groupsaccounts.groupsaccounts_groupid = :groupid
+	ORDER BY online_time DESC
+
 ");
-$query->execute();
+
+
+$query->execute(array(
+	'groupid' => $_SESSION['groupid']
+));
 // On compte le nombre de membres
 $count = $query->rowCount();
 
@@ -76,26 +79,33 @@ if($count != 0) {
 	$json['error'] = '0';
 	
 	$i = 0;
+	$array = array();
+	
 	while($data = $query->fetch()) {
-		if($data['online_status'] == '0') {
-			$status = 'inactive';
-		} elseif($data['online_status'] == '1') {
-			$status = 'busy';
-		} elseif($data['online_status'] == '2') {
-			$status = 'active';
+		if(!in_array($data['online_user'], $array)){
+			if($data['online_status'] == '0') {
+				$status = 'inactive';
+			} elseif($data['online_status'] == '1') {
+				$status = 'busy';
+			} elseif($data['online_status'] == '2') {
+				$status = 'active';
+			}
+			
+			// On enregistre dans la colonne [status] du tableau
+			// le statut du membre : busy, active ou inactive (occupé, en ligne, absent)
+			$infos["status"] = $status;
+			// Et on enregistre dans la colonne [login] le pseudo
+			$infos["login"] = $data['account_login'];
+			
+			// Enfin on enregistre le tableau des infos de CE MEMBRE
+			// dans la [i ème] colonne du tableau des comptes 
+			$accounts[$i] = $infos;
+			$i++;
+			$array[] = $data['online_user'];
 		}
-		
-		// On enregistre dans la colonne [status] du tableau
-		// le statut du membre : busy, active ou inactive (occupé, en ligne, absent)
-		$infos["status"] = $status;
-		// Et on enregistre dans la colonne [login] le pseudo
-		$infos["login"] = $data['account_login'];
-		
-		// Enfin on enregistre le tableau des infos de CE MEMBRE
-		// dans la [i ème] colonne du tableau des comptes 
-		$accounts[$i] = $infos;
-		$i++;
 	}
+
+	//print_r($array); die;
 	// On enregistre le tableau des comptes dans la colonne [list] de JSON
 	$json['list'] = $accounts;
 } else {

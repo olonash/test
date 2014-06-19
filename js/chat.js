@@ -9,7 +9,7 @@ var scrollBar = false;
 
 function getMessages() {
 	// On lance la requête ajax
-	$.getJSON('get-message.php?dateConnexion='+$("#dateConnexion").val(), function(data) {
+	$.getJSON('scripts/get-message.php?dateConnexion='+$("#dateConnexion").val(), function(data) {
 			/* On vérifie que error vaut 0, ce
 			qui signifie qu'il n'y aucune erreur */
 			if(data['error'] == '0') {
@@ -65,7 +65,7 @@ function postMessage() {
 	var message = encodeURIComponent($("#message").val());
 	$.ajax({
 		type: "POST",
-		url: "post-message.php",
+		url: "scripts/post-message.php",
 		data: "message="+message,
 		success: function(msg){
 			// Si la réponse est true, tout s'est bien passé,
@@ -94,19 +94,19 @@ $(document).ready(function() {
 	// Pour ne pas rediriger quand on est sur la page de connexion
 	if(document.getElementById('message')) {
 		// actualisation des messages
-		window.setInterval(getMessages, reloadTime);
+		//window.setInterval(getMessages, reloadTime);
 		// on sélectionne la zone de texte
 		$("#message").focus();
 	}
-
 	getGroups();
 	getOnlineUsers();
+	getMessages();
 });
 
 
 function getOnlineUsers() {
 	// On lance la requête ajax
-	$.getJSON('get-online.php', function(data) {
+	$.getJSON('scripts/get-online.php', function(data) {
 		// Si data['error'] renvoi 0, alors ça veut dire que personne n'est en ligne
 		// ce qui n'est pas normal d'ailleurs
 		if(data['error'] == '0') {		
@@ -119,18 +119,18 @@ function getOnlineUsers() {
 				// Et dans la variable image le lien de l'image
 				if(data["list"][id]["status"] == 'busy') {
 					text = 'Occup&eacute;';
-					image = 'busy';
+					image = 'profil.jpeg';
 				} else if(data["list"][id]["status"] == 'inactive') {
 					text = 'Absent';
-					image = 'inactive';
+					image = 'profil.jpeg';
 				} else {
 					text = 'En ligne';
-					image = 't5171';
+					image = 'profil.jpeg';
 				}
 				// On affiche d'abord le lien pour insérer le pseudo dans la zone de texte
 				online += '<li><a href="#post" onclick="insertLogin(\''+data['list'][id]["login"]+'\')" title="'+text+'">';
 				// Ensuite on affiche l'image
-				online += '<img src="status-'+image+'.gif" /> ';
+				online += '<img width ="25px" src="img/'+image+'" /> ';
 				// Enfin on affiche le pseudo
 				online += data['list'][id]["login"]+'</a> </li>';
 				i++;		
@@ -141,14 +141,14 @@ function getOnlineUsers() {
 	});
 }
 // actualisation des membres connectés
-window.setInterval(getOnlineUsers, '10000');
+//window.setInterval(getOnlineUsers, '10000');
 
 function setStatus(status) {
 	// On lance la requête ajax
 	// type: POST > nous envoyons le nouveau statut
 	$.ajax({
 		type: "POST",
-		url: "set-status.php",
+		url: "scripts/set-status.php",
 		data: "status="+status.value,
 		success: function(msg){
 			// On affiche la réponse
@@ -168,7 +168,27 @@ function rmResponse() {
 
 
 function getGroups() {
-	$.getJSON('get-groups.php', function(data) {
+	$.getJSON('scripts/get-groups.php', function(data) {
 		$("#group-list").html(data['groups']);
+	});
+}
+
+
+function setGroup(groupid) {
+	// On lance la requête ajax
+	// type: POST > nous envoyons le nouveau statut
+
+	$.ajax({
+		type: "POST",
+		url: "scripts/set-group.php",
+		data: "groupid="+groupid,
+		success: function(msg){
+			getOnlineUsers();
+		},
+		error: function(msg){
+			// On affiche l'erreur dans la zone de réponse
+			$("#statusResponse").html('<span style="color:orange">Erreur</span>');
+			//setTimeout(rmResponse, 3000);
+		}
 	});
 }

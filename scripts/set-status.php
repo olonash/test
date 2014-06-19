@@ -6,11 +6,16 @@ $db = db_connect();
 
 if(user_verified()) {
 	$insert = $db->prepare('
-		UPDATE chat_online SET online_status = :status WHERE online_user = :user
-	');
+			INSERT INTO chat_online (online_id, online_ip, online_user, online_status, online_time) 
+			VALUES(:id, :ip, :user, :status, :time)
+		');
 	$insert->execute(array(
-		'status' => $_POST['status'],
-		'user' => $_SESSION['id']		
-	));
+			'id' => '',
+			'ip' => $_SERVER["REMOTE_ADDR"],
+			'user' => $_SESSION['id'],
+			'status' => $_POST['status'],
+			'time' => time()
+		));
+
 }
 ?>

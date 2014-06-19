@@ -43,10 +43,12 @@ if($countUser == 0) {
 		FROM chat_messages
 		LEFT JOIN chat_accounts ON chat_accounts.account_id = chat_messages.message_user
 		WHERE message_time >= :time
+		AND message_groupid = :groupid
 		ORDER BY message_time ASC LIMIT 0,100
 	");
 	$query->execute(array(
-		'time' => $_GET['dateConnexion']
+		'time' => $_GET['dateConnexion'],
+		'groupid' => $_SESSION['groupid']
 	));
 	$count = $query->rowCount();
 	if($count != 0) {
